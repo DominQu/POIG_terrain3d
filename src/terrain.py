@@ -22,6 +22,8 @@ from panda3d.core import AmbientLight
 from panda3d.core import TextureStage
 from panda3d.core import LVector3
 
+VERTEXMUL = 4
+
 class Terrain():
      
     def __init__(self, parent):
@@ -50,7 +52,7 @@ class Terrain():
         #create vertices
         for i in range(self.datax):
             for j in range(self.datay):
-                self.vertex.addData3(i, j, self.data[i,j])
+                self.vertex.addData3(VERTEXMUL*i, VERTEXMUL*j, self.data[i,j])
                 self.texcoord.addData2(i/self.datax, j/self.datay)
                 self.color.addData4(1,1,1,1)
         #calculate normal vectors for each vertex
@@ -64,24 +66,19 @@ class Terrain():
 
         #create triangle primitives
         self.triangles = []
+        self.prim = GeomTriangles(Geom.UHStatic)
 
         for i in range(self.datax - 1):
             for j in range(self.datay - 1):
+                
                 index = j + i * self.datay
 
-                prim1 = GeomTriangles(Geom.UHStatic)
-                prim1.addVertices(index, index + self.datay, index + self.datay + 1)
-
-                prim2 = GeomTriangles(Geom.UHStatic)
-                prim2.addVertices(index, index + self.datay + 1, index + 1)
-
-                self.triangles.append(prim1)
-                self.triangles.append(prim2)
+                self.prim.addVertices(index, index + self.datay, index + self.datay + 1)
+                self.prim.addVertices(index, index + self.datay + 1, index + 1)
 
         self.geom = Geom(self.vdata)
 
-        for i in range((self.datax - 1) * (self.datay - 1) * 2):
-            self.geom.addPrimitive(self.triangles[i])
+        self.geom.addPrimitive(self.prim)
 
         node = GeomNode('gnode')
         node.addGeom(self.geom)
@@ -119,12 +116,44 @@ if __name__ == "__main__":
             self.camera.setPos(50,-150,self.terrain.camera + 150)
             self.camera.setHpr(0,-40,0)
 
+            ts = TextureStage('ts')
+            texture = self.loader.loadTexture('tmp/randommap.png')
             # terrain_nodePath.setTexture(ts, texture)
-            # texture = self.loader.loadTexture('maps/envir-ground.jpg')
-            # ts = TextureStage('ts')
 
             #enable mouse movement
             self.oobe()
+
+            # terrain_nodePath.setDepthOffset(1)
+
+            # Create Ambient Light
+            ambientLight = AmbientLight('ambientLight')
+            ambientLight.setColor((0.1, 0.1, 0.1, 1))
+            ambientLightNP = render.attachNewNode(ambientLight)
+            render.setLight(ambientLightNP)
+
+            # Directional light 01
+            directionalLight = DirectionalLight('directionalLight')
+            directionalLight.setColor((0.8, 0.8, 0.8, 1))
+            directionalLightNP = render.attachNewNode(directionalLight)
+            # This light is facing backwards, towards the camera.
+            directionalLightNP.setHpr(180,-40, 0)
+            render.setLight(directionalLightNP)
+
+            # # Directional light 02
+            # directionalLight = DirectionalLight('directionalLight')
+            # directionalLight.setColor((0.2, 0.2, 0.8, 1))
+            # directionalLightNP = render.attachNewNode(directionalLight)
+            # # This light is facing forwards, away from the camera.
+            # directionalLightNP.setHpr(0, -40, 0)
+            # render.setLight(directionalLightNP)
+
+
+            # dlight = DirectionalLight('dlight')
+            # dlight.setColor((1.,0.4,1.,1.))
+            # dn = self.render.attachNewNode(dlight)
+            # dn.setHpr(0,-45,0)
+            # dn.lookAt(terrain_nodePath)
+            # # self.render.setLight(dn)
 
             #set point light
             plight2 = PointLight('plight2')
@@ -136,12 +165,12 @@ if __name__ == "__main__":
             self.render.setShaderAuto()
 
 
-            # print(f"terrain pos {terrain_nodePath.getPos()}")
-            # terrain_nodePath.setPos(-30,200,0)          
-            # print(f"terrain pos {terrain_nodePath.getPos()}")
+            print(f"terrain pos {terrain_nodePath.getPos()}")
+            terrain_nodePath.setPos(-30,200,0)          
+            print(f"terrain pos {terrain_nodePath.getPos()}")
 
-            # print(f"camera pos {self.camera.getPos()}")
-            # print(f"camera z {self.terrain.camera}")  
+            print(f"camera pos {self.camera.getPos()}")
+            print(f"camera z {self.terrain.camera}")  
 
     if __name__ == '__main__':
         app = App()
