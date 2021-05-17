@@ -5,6 +5,9 @@
 from direct.showbase.ShowBase import ShowBase
 from direct.gui.DirectGui import *
 from panda3d.core import WindowProperties
+import sys
+sys.path.insert(0, '/home/dominik/GitDir/POIG_terrain3d/src')
+from terrain import *
 
 
 class App(ShowBase):
@@ -29,25 +32,7 @@ class App(ShowBase):
                              self.loader.loadTexture("UI/button_highlighted.png"),
                              self.loader.loadTexture("UI/button_disabled.png")
                             )
-
-    def StartApp(self, terrain, texture, submenu):
-        submenu.hide()
-
-        w, h = 1800, 1200
-
-        props = WindowProperties()
-        props.setSize(w,h)
-        base.win.requestProperties(props)
-
-        label1 = DirectLabel(text = "Loading...",
-                            scale = 0.06,
-                            pos = (0,0,0.1),
-                            relief = None,
-                            # parent = self.titlemenu,
-                            text_font = self.font,
-                            text_fg = (1, 1, 1, 1),
-                            frameColor = (0,0,0,0))
-        pass
+        
     def MainMenu(self):
 
         self.titleMenuBackdrop = DirectFrame(frameColor = (0, 0.2, 0, 1),
@@ -187,6 +172,33 @@ class App(ShowBase):
 
     def Light(self, terrain, texture, submenu):
         self.StartApp(terrain, texture, submenu)
+
+    def StartApp(self, terrain, texture, submenu):
+        submenu.hide()
+        self.titleMenuBackdrop.hide()
+
+        w, h = 1800, 1200
+
+        props = WindowProperties()
+        props.setSize(w,h)
+        base.win.requestProperties(props)
+        
+        terrain = Terrain(self.render)
+        terrain_node = terrain.create_terrain()
+        self.terrainNodePath = self.render.attachNewNode(terrain_node)
+
+        self.SetCamera()
+        self.SetTexture()
+        self.SetLights()
+
+    def SetCamera(self):
+        pass
+
+    def SetTexture(self):
+        pass
+
+    def SetLights(self):
+        pass
 
 
 if __name__ == '__main__':
