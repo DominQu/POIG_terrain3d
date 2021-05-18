@@ -20,6 +20,13 @@ class App(ShowBase):
         self.ControlInit()
         self.ParamInit()
         self.MainMenu()
+        self.KeyboardUpdate()
+
+        
+
+        self.updateTask = taskMgr.add(self.update, "update")
+
+    def KeyboardUpdate(self):
 
         self.accept("w", self.UpdateKeymap, ["forward", True])
         self.accept("w-up", self.UpdateKeymap, ["forward", False])
@@ -41,9 +48,7 @@ class App(ShowBase):
         self.accept("arrow_up-up", self.UpdateKeymap, ["tiltup", False])
         self.accept("arrow_down", self.UpdateKeymap, ["tiltdown", True])
         self.accept("arrow_down-up", self.UpdateKeymap, ["tiltdown", False])
-
-        self.updateTask = taskMgr.add(self.update, "update")
-
+    
     def update(self, task):
 
         dt = globalClock.getDt()
@@ -80,11 +85,11 @@ class App(ShowBase):
         self.font = self.loader.loadFont("fonts/Anton-Regular.ttf")
         self.buttonfont = self.loader.loadFont("fonts/VeraMono.ttf")
         self.buttonImages = (
-                             self.loader.loadTexture("UI/button_normal.png"),
-                             self.loader.loadTexture("UI/button_pressed.png"),
-                             self.loader.loadTexture("UI/button_highlighted.png"),
-                             self.loader.loadTexture("UI/button_disabled.png")
-                            )
+            self.loader.loadTexture("UI/button_normal.png"),
+            self.loader.loadTexture("UI/button_pressed.png"),
+            self.loader.loadTexture("UI/button_highlighted.png"),
+            self.loader.loadTexture("UI/button_disabled.png")
+        )
         self.w = 2200
         self.h = 1200
         self.x = 200
@@ -276,20 +281,8 @@ class App(ShowBase):
 
     def _SetCamera(self, terraintype):
 
-        # if terraintype == "mountain":
-        #     self.camera.setPos(600,-4000,self.terrain.camera + 2500)
-        #     self.camera.setHpr(-20,-20,0)
-        #     print(self.terrain.camera)
-        # elif terraintype == "canyon":
-        #     self.camera.setPos(500,-4500,self.terrain.camera + 2500)
-        #     self.camera.setHpr(-21,-20,0)
-        #     print(self.terrain.camera)
-
         self.camera.setPos(self.camerapos[terraintype])
         self.camera.setHpr(self.camerahpr[terraintype])
-
-
-        
 
     def _SetTexture(self, texture):
         
