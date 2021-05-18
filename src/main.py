@@ -17,13 +17,9 @@ class App(ShowBase):
 
         ShowBase.__init__(self)
 
-        self.ControlInit()
         self.ParamInit()
         self.MainMenu()
         self.KeyboardUpdate()
-
-        
-
         self.updateTask = taskMgr.add(self.update, "update")
 
     def KeyboardUpdate(self):
@@ -78,10 +74,8 @@ class App(ShowBase):
     def UpdateKeymap(self, direction, newstate):
         self.keymap[direction] = newstate
 
-    def ControlInit(self):
-        self.disableMouse()
-
     def ParamInit(self):
+        self.disableMouse()
         self.font = self.loader.loadFont("fonts/Anton-Regular.ttf")
         self.buttonfont = self.loader.loadFont("fonts/VeraMono.ttf")
         self.buttonImages = (
@@ -291,6 +285,38 @@ class App(ShowBase):
         self.terrainNodePath.setTexture(ts, tx)
 
     def _SetLights(self):
+        
+        ambientLight = AmbientLight('ambientLight')
+        ambientLight.setColor((0.4, 0.4, 0.4, 1))
+        ambientLightNP = self.render.attachNewNode(ambientLight)
+        self.render.setLight(ambientLightNP)
+
+        # plight = PointLight('plight')
+        # plight.setColor((0.8, 0.8, 0.8, 1))
+        # plnp = self.render.attachNewNode(plight)
+        # plnp.setPos(500, self.terrain.datay*10/2, self.terrain.maxheight+1000)
+        # self.render.setLight(plnp)
+
+        plight = PointLight('plight')
+        plight.setColor((0.8, 0.8, 0.8, 1))
+        plnp = self.render.attachNewNode(plight)
+        plnp.setPos(self.terrain.datax*10/2, 500, self.terrain.maxheight+1000)
+        self.render.setLight(plnp)
+
+        lens = PerspectiveLens()
+        lens.setFov(60)
+
+        slight = Spotlight('slight')
+        slight.setColor((1,1,1,1))
+        slight.setLens(lens)
+        slight.setShadowCaster(True)
+        sn = self.render.attachNewNode(slight)
+        sn.lookAt(self.terrainNodePath)
+        sn.setPos(self.terrain.datax*10/2,-2000, self.terrain.maxheight+500)
+        sn.setHpr(0,-20,0)
+        self.render.setLight(sn)
+
+        self.render.setShaderAuto()
         pass
 
 
