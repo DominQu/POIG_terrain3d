@@ -25,24 +25,32 @@ from panda3d.core import WindowProperties
 
 import numpy as np
 import logging
-import time
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%I:%M:%S')
-logging.warning('dziala')
 
-VERTEXMUL = 4
+VERTEXMUL = 10
 
 class Terrain():
      
-    def __init__(self, parent):
+    def __init__(self, parent, terraintype):
 
         self.parent = parent
-        self.data = png_load()
+
+        self.demfiles = {
+            "mountain": r'dems/agri-small-dem.tif',
+            "canyon": r'dems/canyon.png'
+        }
+
+        if terraintype == "mountain":
+            self.data = geotiff_load(self.demfiles[terraintype])
+        elif terraintype == "canyon":
+            self.data = png_load(self.demfiles[terraintype])
+
+        self.maxheight = self.data.max()
         self.camera = self.data[0,0]
         self.numrows = self.data.size
         self.datax = self.data.shape[0]
         self.datay = self.data.shape[1]
-        # print(f"datax {self.datax} datay {self.datay} dateexample {self.data[34,34]}")
 
     def create_terrain(self):
         '''Load height data, create 3D graphics elements, return geometry node'''
@@ -116,108 +124,14 @@ class Terrain():
 if __name__ == "__main__":
     from direct.showbase.ShowBase import ShowBase
 
-    logging.info('start programu')
-
     class App(ShowBase):
 
         def __init__(self):
 
             ShowBase.__init__(self)
-
-            w, h = 1800, 1200
-
-            props = WindowProperties()
-            props.setSize(w,h)
-            base.win.requestProperties(props)
-
-            self.disableMouse()
-            
-            self.terrain = Terrain(self.render)
+            self.terrain = Terrain(self.render, "mountain")
             terrain_node = self.terrain.create_terrain()
+            self.terrainNodePath = self.render.attachNewNode(terrain_node)
 
-            terrain_nodePath = self.render.attachNewNode(terrain_node)
-            self.camera.setPos(300,-1000,self.terrain.camera + 600)
-            self.camera.setHpr(0,-30,0)
-
-            ts = TextureStage('ts')
-            texture = self.loader.loadTexture('tmp/randommap.png')
-            # terrain_nodePath.setTexture(ts, texture)
-
-            #enable mouse movement
-            self.oobe()
-
-            # terrain_nodePath.setDepthOffset(1)
-
-            # Create Ambient Light
-            ambientLight = AmbientLight('ambientLight')
-            ambientLight.setColor((0.2, 0.2, 0.2, 1))
-            ambientLightNP = self.render.attachNewNode(ambientLight)
-            self.render.setLight(ambientLightNP)
-
-            # Directional light 01
-            directionalLight = DirectionalLight('directionalLight')
-            directionalLight.setColor((0.8, 0.8, 0.8, 1))
-            directionalLight.setShadowCaster(True)
-            directionalLightNP = render.attachNewNode(directionalLight)
-            # This light is facing backwards, towards the camera.
-            directionalLightNP.setHpr(180,-40, 0)
-            # render.setLight(directionalLightNP)
-
-            # # Directional light 02
-            # directionalLight = DirectionalLight('directionalLight')
-            # directionalLight.setColor((0.2, 0.2, 0.8, 1))
-            # directionalLightNP = render.attachNewNode(directionalLight)
-            # # This light is facing forwards, away from the camera.
-            # directionalLightNP.setHpr(0, -40, 0)
-            # render.setLight(directionalLightNP)
-
-
-            dlight = DirectionalLight('dlight')
-            # dlight.setColor((1.,0.4,1.,1.))
-            dn = self.render.attachNewNode(dlight)
-            dn.setHpr(0,-45,0)
-            # dn.lookAt(terrain_nodePath)
-            # self.render.setLight(dn)
-
-            lens = PerspectiveLens()
-            lens.setFov(60)
-
-            slight = Spotlight('slight')
-            slight.setColor((1,1,1,1))
-            slight.setLens(lens)
-            # slight.setShadowCaster(True)
-            sn = self.render.attachNewNode(slight)
-            sn.lookAt(terrain_nodePath)
-            sn.setPos(3000, -50, 350)
-            sn.setHpr(-10,-20,0)
-            self.render.setLight(sn)
-
-            #set point light
-            plight2 = PointLight('plight2')
-            plight2.attenuation = (1,0,0)
-
-            plight2.setColor((0.2, 0.8, 0.2, 1))
-            plnp2 = self.render.attachNewNode(plight2)
-            plnp2.setPos(-100, -100, 500)
-            self.render.setLight(plnp2)
-
-
-            plight = PointLight('plight')
-            plight.setColor((0.2, 0.8, 0.2, 1))
-            plnp = self.render.attachNewNode(plight)
-            plnp.setPos(1000, 1000, 200)
-            # self.render.setLight(plnp)
-
-            self.render.setShaderAuto()
-
-
-            print(f"terrain pos {terrain_nodePath.getPos()}")
-            terrain_nodePath.setPos(-30,200,0)          
-            print(f"terrain pos {terrain_nodePath.getPos()}")
-
-            print(f"camera pos {self.camera.getPos()}")
-            print(f"camera z {self.terrain.camera}")  
-
-    if __name__ == '__main__':
-        app = App()
-        app.run()
+    app = App()
+    app.run()
