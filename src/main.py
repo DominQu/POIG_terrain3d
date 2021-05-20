@@ -19,6 +19,8 @@ class App(ShowBase):
 
         self.ParamInit()
         self.MainMenu()
+        self.OnScreenMenu()
+        self.AlwaysOnScreen()
         self.KeyboardUpdate()
         self.updateTask = taskMgr.add(self.update, "update")
 
@@ -66,9 +68,9 @@ class App(ShowBase):
         if self.keymap["tiltright"]:
             self.camera.setHpr(self.camera.getHpr() + Vec3(-20*dt, 0, 0))
         if self.keymap["tiltup"]:
-            self.camera.setHpr(self.camera.getHpr() + Vec3(0, -20*dt, 0))
-        if self.keymap["tiltdown"]:
             self.camera.setHpr(self.camera.getHpr() + Vec3(0, 20*dt, 0))
+        if self.keymap["tiltdown"]:
+            self.camera.setHpr(self.camera.getHpr() + Vec3(0, -20*dt, 0))
         return task.cont
 
     def UpdateKeymap(self, direction, newstate):
@@ -272,6 +274,7 @@ class App(ShowBase):
         self._SetCamera(terraintype)
         self._SetTexture(texture)
         self._SetLights()
+        self.alwaysframe.show()
 
     def _SetCamera(self, terraintype):
 
@@ -290,12 +293,6 @@ class App(ShowBase):
         ambientLight.setColor((0.4, 0.4, 0.4, 1))
         ambientLightNP = self.render.attachNewNode(ambientLight)
         self.render.setLight(ambientLightNP)
-
-        # plight = PointLight('plight')
-        # plight.setColor((0.8, 0.8, 0.8, 1))
-        # plnp = self.render.attachNewNode(plight)
-        # plnp.setPos(500, self.terrain.datay*10/2, self.terrain.maxheight+1000)
-        # self.render.setLight(plnp)
 
         plight = PointLight('plight')
         plight.setColor((0.8, 0.8, 0.8, 1))
@@ -317,8 +314,95 @@ class App(ShowBase):
         self.render.setLight(sn)
 
         self.render.setShaderAuto()
+
+    def AlwaysOnScreen(self):
+        
+        self.alwaysframe = DirectFrame(
+            frameColor = (0,0,0,0),
+            frameSize = (-1,1,-1,1)
+        )
+        button1 = DirectButton(text="Menu",
+                               command = self.ToggleOnScreenMenu,
+                               pos = (-1.7,0,0.9),
+                               parent = self.alwaysframe,
+                               scale = 0.05,
+                               text_font = self.buttonfont,
+                               frameTexture = self.buttonImages,
+                               frameSize = (-2,2,-1,1),
+                               text_scale = 0.8,
+                               text_fg = (1,1,1,1),
+                               relief = DGG.FLAT,
+                               text_pos = (0,-0.3))
+        self.alwaysframe.hide()
+    
+    def ToggleOnScreenMenu(self):
+        
+        if self.onscreenmenu.isHidden():
+            self.onscreenmenu.show()
+        else:
+            self.onscreenmenu.hide()
+
+    def OnScreenMenu(self):
+
+        self.onscreenmenu = DirectFrame(
+            frameColor = (0,0,0,0.4),
+            frameSize = (-1, -0.2, -1, 1),
+            pos = (-1,-1,0)
+        )
+        button1 = DirectButton(text="Menu główne",
+                               command = self.Restart,
+                               pos = (-0.52,0,0.7),
+                               parent = self.onscreenmenu,
+                               scale = 0.05,
+                               text_font = self.buttonfont,
+                               frameTexture = self.buttonImages,
+                               frameSize = (-4,4,-1,1),
+                               text_scale = 0.8,
+                               text_fg = (1,1,1,1),
+                               relief = DGG.FLAT,
+                               text_pos = (0,-0.3))
+
+        button2 = DirectButton(text="Mapa wysokości",
+                               command = self.Restart,
+                               pos = (-0.52,0,0.4),
+                               parent = self.onscreenmenu,
+                               scale = 0.05,
+                               text_font = self.buttonfont,
+                               frameTexture = self.buttonImages,
+                               frameSize = (-4,4,-1,1),
+                               text_scale = 0.8,
+                               text_fg = (1,1,1,1),
+                               relief = DGG.FLAT,
+                               text_pos = (0,-0.3))
+
+        button3 = DirectButton(text="Reset kamery",
+                               command = self.ResetCamera,
+                               pos = (-0.52,0,0.1),
+                               parent = self.onscreenmenu,
+                               scale = 0.05,
+                               text_font = self.buttonfont,
+                               frameTexture = self.buttonImages,
+                               frameSize = (-4,4,-1,1),
+                               text_scale = 0.8,
+                               text_fg = (1,1,1,1),
+                               relief = DGG.FLAT,
+                               text_pos = (0,-0.3))          
+        
+        self.onscreenmenu.hide()
+
+    def Restart(self):
+
+        self.terrainNodePath.removeNode()
+        self.alwaysframe.hide()
+        self.onscreenmenu.hide()
+        self.titleMenuBackdrop.show()
+        self.titlemenu.show()
+
+    def ResetCamera(self):
         pass
 
+    def ShowMap(self):
+        pass
 
 if __name__ == '__main__':
     app = App()
