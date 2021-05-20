@@ -77,6 +77,7 @@ class App(ShowBase):
         self.keymap[direction] = newstate
 
     def ParamInit(self):
+       
         self.disableMouse()
         self.font = self.loader.loadFont("fonts/Anton-Regular.ttf")
         self.buttonfont = self.loader.loadFont("fonts/VeraMono.ttf")
@@ -91,7 +92,7 @@ class App(ShowBase):
         self.x = 200
         self.y = 100
         self.camerapos = {
-            "mountain": Vec3(600,-4000,3675),
+            "mountain": Vec3(400,-4100,3675),
             "canyon":Vec3(500,-4500,2700)
         }
         self.camerahpr = {
@@ -103,6 +104,10 @@ class App(ShowBase):
             "moon": 'textures/agri-small-winter.jpg',
             "river": 'textures/river.png',
             "desert": 'textures/desert.png'
+        }
+        self.heightmaps = {
+            "mountain": 'dems/mountain.png',
+            "canyon": 'dems/canyon.png'
         }
         self.keymap = {
             "forward": False,
@@ -116,6 +121,8 @@ class App(ShowBase):
             "tiltup": False,
             "tiltdown": False
         }
+        self.mountain = False
+        self.canyon = False
         
     def MainMenu(self):
 
@@ -159,6 +166,19 @@ class App(ShowBase):
         button2 = DirectButton(text="Kanion",
                                command= self.Canyon,
                                pos = (0,0,-0.4),
+                               parent = self.titlemenu,
+                               scale = 0.1,
+                               text_font = self.buttonfont,
+                               frameTexture = self.buttonImages,
+                               frameSize = (-4,4,-1,1),
+                               text_scale = 0.8,
+                               text_fg = (1,1,1,1),
+                               relief = DGG.FLAT,
+                               text_pos = (0,-0.3))
+
+        button3 = DirectButton(text="Wyjście",
+                               command= self.finalizeExit,
+                               pos = (0,0,-0.7),
                                parent = self.titlemenu,
                                scale = 0.1,
                                text_font = self.buttonfont,
@@ -213,6 +233,20 @@ class App(ShowBase):
                                text_fg = (1,1,1,1),
                                relief = DGG.FLAT,
                                text_pos = (0,-0.3))
+
+        button2 = DirectButton(text="Powrót",
+                               command= self.Restart,
+                               extraArgs = ["mountain"],
+                               pos = (0,0,-0.5),
+                               parent = self.mountainmenu,
+                               scale = 0.1,
+                               text_font = self.buttonfont,
+                               frameTexture = self.buttonImages,
+                               frameSize = (-4,4,-1,1),
+                               text_scale = 0.8,
+                               text_fg = (1,1,1,1),
+                               relief = DGG.FLAT,
+                               text_pos = (0,-0.3))
     def Canyon(self):
         
         self.titlemenu.hide()
@@ -248,6 +282,20 @@ class App(ShowBase):
                                command= self.Light,
                                extraArgs = ["canyon", "desert", self.canyonmenu],
                                pos = (0,0,-0.2),
+                               parent = self.canyonmenu,
+                               scale = 0.1,
+                               text_font = self.buttonfont,
+                               frameTexture = self.buttonImages,
+                               frameSize = (-4,4,-1,1),
+                               text_scale = 0.8,
+                               text_fg = (1,1,1,1),
+                               relief = DGG.FLAT,
+                               text_pos = (0,-0.3))
+
+        button3 = DirectButton(text="Powrót",
+                               command= self.Restart,
+                               extraArgs = ["canyon"],
+                               pos = (0,0,-0.5),
                                parent = self.canyonmenu,
                                scale = 0.1,
                                text_font = self.buttonfont,
@@ -337,6 +385,8 @@ class App(ShowBase):
                                text_fg = (1,1,1,1),
                                relief = DGG.FLAT,
                                text_pos = (0,-0.3))
+
+        #Add on screen control text
         self.alwaysframe.hide()
     
     def ToggleOnScreenMenu(self):
@@ -355,6 +405,7 @@ class App(ShowBase):
         )
         button1 = DirectButton(text="Menu główne",
                                command = self.Restart,
+                               extraArgs = ["terrain"],
                                pos = (-0.52,0,0.7),
                                parent = self.onscreenmenu,
                                scale = 0.05,
@@ -367,7 +418,7 @@ class App(ShowBase):
                                text_pos = (0,-0.3))
 
         button2 = DirectButton(text="Mapa wysokości",
-                               command = self.Restart,
+                               command = self.ShowMap,
                                pos = (-0.52,0,0.4),
                                parent = self.onscreenmenu,
                                scale = 0.05,
@@ -390,16 +441,35 @@ class App(ShowBase):
                                text_scale = 0.8,
                                text_fg = (1,1,1,1),
                                relief = DGG.FLAT,
+                               text_pos = (0,-0.3))
+
+        button4 = DirectButton(text="Wyjście",
+                               command = self.finalizeExit,
+                               pos = (-0.52,0,-0.2),
+                               parent = self.onscreenmenu,
+                               scale = 0.05,
+                               text_font = self.buttonfont,
+                               frameTexture = self.buttonImages,
+                               frameSize = (-4,4,-1,1),
+                               text_scale = 0.8,
+                               text_fg = (1,1,1,1),
+                               relief = DGG.FLAT,
                                text_pos = (0,-0.3))          
         
         self.onscreenmenu.hide()
 
-    def Restart(self):
+    def Restart(self, node_to_remove):
 
         self.mountain = False
         self.canyon = False
 
-        self.terrainNodePath.removeNode()
+        if node_to_remove == "terrain":
+            self.terrainNodePath.removeNode()
+        elif node_to_remove == "canyon":
+            self.canyonmenu.destroy()
+        elif node_to_remove == "mountain":
+            self.mountainmenu.destroy()
+
         self.alwaysframe.hide()
         self.onscreenmenu.hide()
         self.titleMenuBackdrop.show()
@@ -414,8 +484,35 @@ class App(ShowBase):
             self.camera.setPos(self.camerapos["canyon"])
             self.camera.setHpr(self.camerahpr["canyon"])
 
-    def ShowMap(self):
-        pass
+    def ShowMap(self, ):
+
+        self.onscreenmenu.hide()
+
+        if self.mountain:
+            filepath = self.heightmaps["mountain"]
+        elif self.canyon:
+            filepath = self.heightmaps["canyon"]
+
+        self.mapimage = OnscreenImage(image=filepath, pos= (1,0,0.2),scale= 0.55)
+
+        self.heightmapbutton = DirectButton(text="Close",
+                               command = self.DestroyMap,
+                               pos = (1.45,0,0.8),
+                               parent = self.alwaysframe,
+                               scale = 0.05,
+                               text_font = self.buttonfont,
+                               frameTexture = self.buttonImages,
+                               frameSize = (-2,2,-1,1),
+                               text_scale = 0.8,
+                               text_fg = (1,1,1,1),
+                               relief = DGG.FLAT,
+                               text_pos = (0,-0.3))
+
+    def DestroyMap(self):
+
+        self.mapimage.destroy()
+        self.heightmapbutton.destroy()
+        
 
 if __name__ == '__main__':
     app = App()
