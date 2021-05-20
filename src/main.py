@@ -173,6 +173,8 @@ class App(ShowBase):
         
         self.titlemenu.hide()
 
+        self.mountain = True
+
         self.mountainmenu = DirectFrame(frameColor = (1,0,1,0))
 
         label = DirectLabel(text = "Wybierz teksturę:",
@@ -214,6 +216,8 @@ class App(ShowBase):
     def Canyon(self):
         
         self.titlemenu.hide()
+
+        self.canyon = True
 
         self.canyonmenu = DirectFrame(frameColor = (1,0,1,0))
 
@@ -392,6 +396,9 @@ class App(ShowBase):
 
     def Restart(self):
 
+        self.mountain = False
+        self.canyon = False
+
         self.terrainNodePath.removeNode()
         self.alwaysframe.hide()
         self.onscreenmenu.hide()
@@ -399,7 +406,13 @@ class App(ShowBase):
         self.titlemenu.show()
 
     def ResetCamera(self):
-        pass
+        
+        if self.mountain == True:
+            self.camera.setPos(self.camerapos["mountain"])
+            self.camera.setHpr(self.camerahpr["mountain"])
+        elif self.canyon == True:
+            self.camera.setPos(self.camerapos["canyon"])
+            self.camera.setHpr(self.camerahpr["canyon"])
 
     def ShowMap(self):
         pass
