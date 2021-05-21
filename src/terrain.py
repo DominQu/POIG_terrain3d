@@ -7,9 +7,7 @@
              apply_texture
              set_light
 '''
-import sys
-sys.path.insert(0, '/home/dominik/GitDir/POIG_terrain3d/tmp')
-from tmpdata import *
+from datareader import *
 
 from panda3d.core import GeomVertexFormat
 from panda3d.core import GeomVertexData
@@ -17,11 +15,7 @@ from panda3d.core import Geom
 from panda3d.core import GeomVertexWriter
 from panda3d.core import GeomTriangles
 from panda3d.core import GeomNode
-from panda3d.core import DirectionalLight, PointLight, Spotlight, PerspectiveLens
-from panda3d.core import AmbientLight
-from panda3d.core import TextureStage
 from panda3d.core import LVector3
-from panda3d.core import WindowProperties
 
 import numpy as np
 import logging

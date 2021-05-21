@@ -4,10 +4,11 @@
 '''
 from direct.showbase.ShowBase import ShowBase
 from direct.gui.DirectGui import *
+from panda3d.core import DirectionalLight, PointLight, Spotlight, PerspectiveLens
+from panda3d.core import AmbientLight
+from panda3d.core import TextureStage
 from panda3d.core import WindowProperties
 from panda3d.core import Vec3
-import sys
-sys.path.insert(0, '/home/dominik/GitDir/POIG_terrain3d')
 from terrain import *
 
 
@@ -392,18 +393,6 @@ class App(ShowBase):
                                command = self.HideDialog,
                                text_font = self.buttonfont,
                                text_fg = (1, 1, 1, 1))
-
-        print(self.mountain)
-        if not self.mountain:
-            label1 = DirectLabel(text = "Góra Agri - najwyższy szczyt Turcji",
-                                 scale = 0.1,
-                                 pos = (0,0,0),
-                                 relief = None,
-                                 parent = self.alwaysframe,
-                                 text_font = self.font,
-                                 text_fg = (1, 1, 1, 1),
-                                 frameColor = (0,0,0,0),
-                                )
        
         self.alwaysframe.hide()
 
