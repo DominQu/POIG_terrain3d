@@ -19,8 +19,8 @@ class App(ShowBase):
 
         self.ParamInit()
         self.MainMenu()
-        self.OnScreenMenu()
         self.AlwaysOnScreen()
+        self.OnScreenMenu()
         self.KeyboardUpdate()
         self.updateTask = taskMgr.add(self.update, "update")
 
@@ -327,6 +327,7 @@ class App(ShowBase):
         self._SetTexture(texture)
         self._SetLights()
         self.alwaysframe.show()
+        self.dialog.show()
 
     def _SetCamera(self, terraintype):
 
@@ -386,8 +387,29 @@ class App(ShowBase):
                                relief = DGG.FLAT,
                                text_pos = (0,-0.3))
 
-        #Add on screen control text
+        self.dialog = OkDialog(parent= self.alwaysframe,
+                               text= "Sterowanie:\nW - do przodu\nS - do tyłu  \nA - w lewo   \nD - w prawo  \nQ - w górę\nE - w dół\nStrzałka góra/dół - pochyl w górę/dół  \nStrzałka lewo/prawo - obrót w lewo/prawo",
+                               command = self.HideDialog,
+                               text_font = self.buttonfont,
+                               text_fg = (1, 1, 1, 1))
+
+        print(self.mountain)
+        if not self.mountain:
+            label1 = DirectLabel(text = "Góra Agri - najwyższy szczyt Turcji",
+                                 scale = 0.1,
+                                 pos = (0,0,0),
+                                 relief = None,
+                                 parent = self.alwaysframe,
+                                 text_font = self.font,
+                                 text_fg = (1, 1, 1, 1),
+                                 frameColor = (0,0,0,0),
+                                )
+       
         self.alwaysframe.hide()
+
+    def HideDialog(self, dialogvalue):
+
+        self.dialog.hide()
     
     def ToggleOnScreenMenu(self):
         
@@ -443,9 +465,22 @@ class App(ShowBase):
                                relief = DGG.FLAT,
                                text_pos = (0,-0.3))
 
-        button4 = DirectButton(text="Wyjście",
-                               command = self.finalizeExit,
+        button4 = DirectButton(text="Sterowanie",
+                               command = self.dialog.show,
                                pos = (-0.52,0,-0.2),
+                               parent = self.onscreenmenu,
+                               scale = 0.05,
+                               text_font = self.buttonfont,
+                               frameTexture = self.buttonImages,
+                               frameSize = (-4,4,-1,1),
+                               text_scale = 0.8,
+                               text_fg = (1,1,1,1),
+                               relief = DGG.FLAT,
+                               text_pos = (0,-0.3))
+
+        button5 = DirectButton(text="Wyjście",
+                               command = self.finalizeExit,
+                               pos = (-0.52,0,-0.5),
                                parent = self.onscreenmenu,
                                scale = 0.05,
                                text_font = self.buttonfont,
