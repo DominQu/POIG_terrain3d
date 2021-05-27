@@ -26,6 +26,7 @@ class App(ShowBase):
         self.updateTask = taskMgr.add(self.update, "update")
 
     def KeyboardUpdate(self):
+        '''Accept key presses'''
 
         self.accept("w", self.UpdateKeymap, ["forward", True])
         self.accept("w-up", self.UpdateKeymap, ["forward", False])
@@ -49,6 +50,7 @@ class App(ShowBase):
         self.accept("arrow_down-up", self.UpdateKeymap, ["tiltdown", False])
     
     def update(self, task):
+        '''Check if key was pressed and take action if True'''
 
         dt = globalClock.getDt()
 
@@ -75,9 +77,12 @@ class App(ShowBase):
         return task.cont
 
     def UpdateKeymap(self, direction, newstate):
+        '''Update keymap'''
+
         self.keymap[direction] = newstate
 
     def ParamInit(self):
+        '''Initialize variables used in program'''
        
         self.disableMouse()
         self.font = self.loader.loadFont("fonts/Anton-Regular.ttf")
@@ -122,10 +127,11 @@ class App(ShowBase):
             "tiltup": False,
             "tiltdown": False
         }
-        self.mountain = False
-        self.canyon = False
+        self.mountain = False    #flag specifing which terrain is being rendered
+        self.canyon = False      #flag specifing which terrain is being rendered
         
     def MainMenu(self):
+        '''Create main menu frame'''
 
         self.titleMenuBackdrop = DirectFrame(frameColor = (0, 0.2, 0, 1),
                                              frameSize = (-1, 1, -1, 1),
@@ -191,6 +197,7 @@ class App(ShowBase):
                                text_pos = (0,-0.3))
 
     def Mountain(self):
+        '''Create mountain terrain menu if mountain was choosen in main menu'''
         
         self.titlemenu.hide()
 
@@ -248,7 +255,9 @@ class App(ShowBase):
                                text_fg = (1,1,1,1),
                                relief = DGG.FLAT,
                                text_pos = (0,-0.3))
+
     def Canyon(self):
+        '''Create canyon terrain menu if canyon was choosen in main menu'''
         
         self.titlemenu.hide()
 
@@ -308,9 +317,12 @@ class App(ShowBase):
                                text_pos = (0,-0.3))
 
     def Light(self, terrain, texture, submenu):
+        '''Choose light direction - feature not yet implemented'''
+
         self.StartApp(terrain, texture, submenu)
 
     def StartApp(self, terraintype, texture, submenu):
+        '''Call terrain creating method and set the scene'''
         
         submenu.hide()
         self.titleMenuBackdrop.hide()
@@ -320,28 +332,31 @@ class App(ShowBase):
         self.props.setOrigin(self.x, self.y)
         base.win.requestProperties(self.props)
         
-        self.terrain = Terrain(self.render, terraintype)
+        self.terrain = Terrain(terraintype)
         terrain_node = self.terrain.create_terrain()
         self.terrainNodePath = self.render.attachNewNode(terrain_node)
 
-        self._SetCamera(terraintype)
-        self._SetTexture(texture)
-        self._SetLights()
+        self.SetCamera(terraintype)
+        self.SetTexture(texture)
+        self.SetLights()
         self.alwaysframe.show()
         self.dialog.show()
 
-    def _SetCamera(self, terraintype):
+    def SetCamera(self, terraintype):
+        '''Set camera postion specific for the type of the rendered terrain'''
 
         self.camera.setPos(self.camerapos[terraintype])
         self.camera.setHpr(self.camerahpr[terraintype])
 
-    def _SetTexture(self, texture):
+    def SetTexture(self, texture):
+        '''Set texture specific for the rendered terrain'''
         
         ts = TextureStage('ts')
         tx = self.loader.loadTexture(self.texturefiles[texture])
         self.terrainNodePath.setTexture(ts, tx)
 
-    def _SetLights(self):
+    def SetLights(self):
+        '''Set lights specific for the rendered terrain'''
         
         ambientLight = AmbientLight('ambientLight')
         ambientLight.setColor((0.4, 0.4, 0.4, 1))
@@ -370,6 +385,7 @@ class App(ShowBase):
         self.render.setShaderAuto()
 
     def AlwaysOnScreen(self):
+        '''Create on screen dialog and place an always visible menu button on it'''
         
         self.alwaysframe = DirectFrame(
             frameColor = (0,0,0,0),
@@ -397,10 +413,12 @@ class App(ShowBase):
         self.alwaysframe.hide()
 
     def HideDialog(self, dialogvalue):
+        '''Hide sterring help dialog'''
 
         self.dialog.hide()
     
     def ToggleOnScreenMenu(self):
+        '''Toggle visibilty of on screen menu when button was pressed'''
         
         if self.onscreenmenu.isHidden():
             self.onscreenmenu.show()
@@ -408,6 +426,7 @@ class App(ShowBase):
             self.onscreenmenu.hide()
 
     def OnScreenMenu(self):
+        '''Create on screen menu'''
 
         self.onscreenmenu = DirectFrame(
             frameColor = (0,0,0,0.4),
@@ -483,6 +502,7 @@ class App(ShowBase):
         self.onscreenmenu.hide()
 
     def Restart(self, node_to_remove):
+        '''Delete current terrain and return to main menu'''
 
         self.mountain = False
         self.canyon = False
@@ -500,6 +520,7 @@ class App(ShowBase):
         self.titlemenu.show()
 
     def ResetCamera(self):
+        '''Reset camera position to default'''
         
         if self.mountain == True:
             self.camera.setPos(self.camerapos["mountain"])
@@ -509,6 +530,7 @@ class App(ShowBase):
             self.camera.setHpr(self.camerahpr["canyon"])
 
     def ShowMap(self, ):
+        '''Show png heightmap on screen when button was pressed'''
 
         self.onscreenmenu.hide()
 
@@ -533,11 +555,11 @@ class App(ShowBase):
                                text_pos = (0,-0.3))
 
     def DestroyMap(self):
+        '''Close the png heightmap'''
 
         self.mapimage.destroy()
         self.heightmapbutton.destroy()
         
-
 if __name__ == '__main__':
     app = App()
     app.run()
