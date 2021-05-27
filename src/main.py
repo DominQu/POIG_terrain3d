@@ -519,7 +519,7 @@ class App(ShowBase):
 
         self.mapimage = OnscreenImage(image=filepath, pos= (1,0,0.2),scale= 0.55)
 
-        self.heightmapbutton = DirectButton(text="Close",
+        self.heightmapbutton = DirectButton(text="Zamknij",
                                command = self.DestroyMap,
                                pos = (1.45,0,0.8),
                                parent = self.alwaysframe,
